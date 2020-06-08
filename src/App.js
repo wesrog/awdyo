@@ -1,73 +1,57 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef } from 'react';
+import {Room, WebSocketChannel, MucSignaling, MediaDomElement} from 'rtc-lib'
 import './App.css'
 
-const Clip = props => {
-  return (
-    <audio controls src={props.src}></audio>
-  )
-}
-
-const ClipList = props => {
-  const clips = props.clips
-  const clipItems = clips.map(clip =>
-    <div><Clip src={clip} /></div>
-  )
-
-  return (
-    <div className="clips">{clipItems}</div>
-  )
-}
-
 const App = () => {
-  const [recorder, setRecorder] = useState(null)
-  const [isRecording, setIsRecording] = useState(false)
-  const [clips, setClips] = useState([])
+  const audioRef = useRef(null)
 
-  useEffect(() => {
+  const channel = new WebSocketChannel('wss://easy.innovailable.eu/w35w0r7d')
+  const signaling = new MucSignaling(channel)
+  const opts = {
+    stun: 'stun:stun.innovailable.eu'
+  }
+  const room = new Room(signaling, opts)
+  room.on('peer_joined', peer => {
+    console.log('peer connected')
+    console.log(peer)
+    new MediaDomElement(audioRef.current, peer)
+
+    peer.on('left', () => {
+      console.log('peer left')
+    })
+  })
+
+  const broadcast = async () => {
     const constraints = { audio: true }
-    navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, onError)
-  }, [])
 
-  const onSuccess = (stream) => {
-    setRecorder(new MediaRecorder(stream))
-    console.log('success')
-  }
-
-  const onError = (err) => {
-    console.log('err:', err)
-  }
-
-  const start = () => {
-    setIsRecording(true)
-    recorder.start()
-
-    recorder.ondataavailable = e => {
-      const blob = new Blob([e.data], {type: 'audio/ogg; codecs=opus'})
-      const audioUrl = window.URL.createObjectURL(blob)
-      setClips(clips => [...clips, audioUrl])
-      console.log(clips)
+    try {
+      await room.connect()
+    } catch(err) {
+      alert(err)
     }
 
-    recorder.onstop = e => {
-      console.log('data avail after recorder stopped')
+    try {
+      room.local.addStream(constraints)
+    } catch(err) {
+      alert(err)
     }
   }
 
-  const stop = () => {
-    setIsRecording(false)
-    recorder.stop()
+  const listen = async () => {
+    console.log('listen')
+    console.log(room)
+    try {
+      await room.connect()
+    } catch(err) {
+      alert(err)
+    }
   }
 
   return (
     <main className="App">
-      {
-        isRecording
-          ? <button onClick={stop}>Stop</button>
-          : <button onClick={start}>Start</button>
-      }
-      <p>{isRecording ? 'Recording...' : 'Hit start to record'}</p>
-
-      <ClipList clips={clips} />
+      <button onClick={broadcast}>Broadcast</button>
+      <button onClick={listen}>Listen</button>
+      <audio autoPlay ref={audioRef}></audio>
     </main>
   );
 }
