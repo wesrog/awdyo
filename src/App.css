@@ -1,8 +1,23 @@
+body {
+  box-sizing: border-box;
+}
+
 .App {
-  text-align: center;
+  margin: 1em auto;
+  width: 800px;
+  border: 1px solid #333;
+  padding: 1em;
 }
 
 .clips {
   display: flex;
   flex-direction: column-reverse;
+}
+
+main div {
+  margin: 1em 0;
+}
+
+input[type=text] {
+  margin: 0 .5em 0 0;
 }
