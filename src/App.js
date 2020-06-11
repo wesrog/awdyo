@@ -17,7 +17,18 @@ const App = () => {
   const [listenRoomName, setListenRoomName] = useState('w35w0r7d')
 
   const broadcast = async () => {
-    const constraints = { audio: true }
+    const constraints =  {
+      audio: {
+        autoGainControl: false,
+        channelCount: 2,
+        echoCancellation: false,
+        latency: 0,
+        noiseSuppression: false,
+        sampleRate: 48000,
+        sampleSize: 16,
+        volume: 1.0
+      }
+    }
     const room = initRoom(broadcastRoomName)
     room.on('peer_joined', peer => {
       console.log('peer connected: ', peer)
