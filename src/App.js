@@ -15,6 +15,8 @@ const App = () => {
   const audioRef = useRef(null)
   const [broadcastRoomName, setBroadcastRoomName] = useState('w35w0r7d')
   const [listenRoomName, setListenRoomName] = useState('w35w0r7d')
+  const [numPeers, setNumPeers] = useState(0)
+  const [connected, setConnected] = useState(false)
 
   const broadcast = async () => {
     const constraints =  {
@@ -24,7 +26,7 @@ const App = () => {
         echoCancellation: false,
         latency: 0,
         noiseSuppression: false,
-        sampleRate: 48000,
+        sampleRate: 44000,
         sampleSize: 16,
         volume: 1.0
       }
@@ -32,15 +34,18 @@ const App = () => {
     const room = initRoom(broadcastRoomName)
     room.on('peer_joined', peer => {
       console.log('peer connected: ', peer)
-      console.log('peers: ', room.peers)
+      console.log('room: ', room)
+      setNumPeers(Object.keys(room.peers).length)
 
       peer.on('left', () => {
         console.log('peer left')
+        setNumPeers(Object.keys(room.peers).length)
       })
     })
 
     try {
       await room.connect()
+      setConnected(true)
       room.local.addStream(constraints)
     } catch(err) {
       alert(err)
@@ -54,13 +59,17 @@ const App = () => {
       console.log('peer connected: ', peer)
       new MediaDomElement(audioRef.current, peer)
       audioRef.current.controls = true
+      audioRef.current.autoPlay = true
+      setNumPeers(Object.keys(room.peers).length)
 
       peer.on('left', () => {
         console.log('peer left')
+        setNumPeers(Object.keys(room.peers).length)
       })
     })
     try {
       await room.connect()
+      setConnected(true)
     } catch(err) {
       alert(err)
     }
@@ -68,18 +77,28 @@ const App = () => {
 
   return (
     <main className="App">
-      <div>
-        Room: <input type="text" onChange={(e) => setBroadcastRoomName(e.target.value)} value={broadcastRoomName} />
-        <button onClick={broadcast}>Broadcast</button>
-      </div>
+      { connected
+      ? <>
+          Connected to {broadcastRoomName}!
 
-      <div>
-        Room: <input type="text" onChange={(e) => setListenRoomName(e.target.value)} value={listenRoomName} />
-        <button onClick={listen}>Listen</button>
-        <div>
-          <audio autoPlay ref={audioRef}></audio>
-        </div>
-      </div>
+          <div>
+            Peers: {numPeers}
+          </div>
+        </>
+      : <>
+          <div>
+            Room: <input type="text" onChange={(e) => setBroadcastRoomName(e.target.value)} value={broadcastRoomName} />
+            <button onClick={broadcast}>Broadcast</button>
+          </div>
+
+          <div>
+            Room: <input type="text" onChange={(e) => setListenRoomName(e.target.value)} value={listenRoomName} />
+            <button onClick={listen}>Listen</button>
+          </div>
+        </>
+      }
+
+      <audio autoPlay ref={audioRef}></audio>
     </main>
   );
 }
