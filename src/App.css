@@ -1,23 +1,24 @@
-body {
+* {
   box-sizing: border-box;
 }
 
+#root {
+  background: plum;
+}
+
 .App {
-  margin: 1em auto;
-  width: 800px;
-  border: 1px solid #333;
+  margin: 0 auto;
   padding: 1em;
+  width: 800px;
+  min-height: 100vh;
+  background: white;
 }
 
-.clips {
+.connect {
   display: flex;
-  flex-direction: column-reverse;
+  flex-flow: row wrap;
 }
 
-main div {
-  margin: 1em 0;
-}
-
-input[type=text] {
-  margin: 0 .5em 0 0;
+.connect div {
+  flex-basis: 100%;
 }
