@@ -79,25 +79,27 @@ const App = () => {
     <main className="App">
       { connected
       ? <>
-          Connected to {broadcastRoomName}!
+          <h2>Connected to {broadcastRoomName}!</h2>
 
           <div>
             Peers: {numPeers}
           </div>
         </>
       : <>
-          <div>
-            Room: <input type="text" onChange={(e) => setBroadcastRoomName(e.target.value)} value={broadcastRoomName} />
-            <button onClick={broadcast}>Broadcast</button>
-          </div>
+          <div className="connect">
+            <h2>Select a room to broadcast or listen</h2>
+            <div>
+              Room: <input type="text" onChange={(e) => setBroadcastRoomName(e.target.value)} value={broadcastRoomName} />
+              <button onClick={broadcast}>Broadcast</button>
+            </div>
 
-          <div>
-            Room: <input type="text" onChange={(e) => setListenRoomName(e.target.value)} value={listenRoomName} />
-            <button onClick={listen}>Listen</button>
+            <div>
+              Room: <input type="text" onChange={(e) => setListenRoomName(e.target.value)} value={listenRoomName} />
+              <button onClick={listen}>Listen</button>
+            </div>
           </div>
         </>
       }
-
       <audio autoPlay ref={audioRef}></audio>
     </main>
   );
