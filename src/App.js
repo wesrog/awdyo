@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Room, WebSocketChannel, MucSignaling, MediaDomElement } from 'rtc-lib'
 import './App.css'
 
@@ -11,42 +11,73 @@ const initRoom = (roomName) => {
   return new Room(signaling, opts)
 }
 
-const App = () => {
+const Streams = props => {
+  const peers = Object.entries(props.peers)
+  return (
+    peers.map(peer => <Stream peer={peer} />)
+  )
+}
+
+const Stream = props => {
   const audioRef = useRef(null)
+  const { peer } = props
+
+  peer[1].on('streams_changed', () => {
+    console.log('!!streams changed')
+  })
+
+  useEffect(() => {
+    console.log('stream: ', peer)
+    peer[1].stream().then(res => {
+      console.log('stream res: ', res)
+      audioRef.current.srcObject = res.stream
+    })
+  })
+
+  return (
+    <audio controls autoPlay ref={audioRef}></audio>
+  )
+}
+
+const App = () => {
   const [broadcastRoomName, setBroadcastRoomName] = useState('w35w0r7d')
   const [listenRoomName, setListenRoomName] = useState('w35w0r7d')
-  const [numPeers, setNumPeers] = useState(0)
   const [connected, setConnected] = useState(false)
+  const [peers, setPeers] = useState([])
+  const constraints =  {
+    audio: {
+      autoGainControl: false,
+      channelCount: 2,
+      echoCancellation: false,
+      latency: 0,
+      noiseSuppression: false,
+      sampleRate: 44000,
+      sampleSize: 16,
+      volume: 1.0
+    }
+  }
 
   const broadcast = async () => {
-    const constraints =  {
-      audio: {
-        autoGainControl: false,
-        channelCount: 2,
-        echoCancellation: false,
-        latency: 0,
-        noiseSuppression: false,
-        sampleRate: 44000,
-        sampleSize: 16,
-        volume: 1.0
-      }
-    }
     const room = initRoom(broadcastRoomName)
+    room.local.addStream(constraints)
+
     room.on('peer_joined', peer => {
       console.log('peer connected: ', peer)
-      console.log('room: ', room)
-      setNumPeers(Object.keys(room.peers).length)
+      setPeers(room.peers)
 
       peer.on('left', () => {
         console.log('peer left')
-        setNumPeers(Object.keys(room.peers).length)
+        setPeers([...peers.filter(p => p.signaling.id != peer.signaling.id)])
+      })
+      peer.on('streams_changed', () => {
+        console.log('!!!')
       })
     })
 
     try {
       await room.connect()
+      console.log('connected to room: ', room)
       setConnected(true)
-      room.local.addStream(constraints)
     } catch(err) {
       alert(err)
     }
@@ -54,21 +85,21 @@ const App = () => {
 
   const listen = async () => {
     const room = initRoom(broadcastRoomName)
-    console.log('room: ', room)
     room.on('peer_joined', peer => {
       console.log('peer connected: ', peer)
-      new MediaDomElement(audioRef.current, peer)
-      audioRef.current.controls = true
-      audioRef.current.autoPlay = true
-      setNumPeers(Object.keys(room.peers).length)
+      setPeers(room.peers)
 
       peer.on('left', () => {
         console.log('peer left')
-        setNumPeers(Object.keys(room.peers).length)
+        setPeers([...peers.filter(p => p.signaling.id != peer.signaling.id)])
+      })
+      peer.on('stream_added', () => {
+        console.log('!!! stream added')
       })
     })
     try {
       await room.connect()
+      console.log('connected to room: ', room)
       setConnected(true)
     } catch(err) {
       alert(err)
@@ -82,7 +113,11 @@ const App = () => {
           <h2>Connected to {broadcastRoomName}!</h2>
 
           <div>
-            Peers: {numPeers}
+            Peers: {Object.keys(peers).length}
+          </div>
+
+          <div id="streams">
+            <Streams peers={peers} />
           </div>
         </>
       : <>
@@ -100,7 +135,6 @@ const App = () => {
           </div>
         </>
       }
-      <audio autoPlay ref={audioRef}></audio>
     </main>
   );
 }
