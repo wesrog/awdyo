@@ -18,6 +18,7 @@ const App = () => {
   const [listenRoomName, setListenRoomName] = useState('w35w0r7d')
   const [connected, setConnected] = useState(false)
   const [roomObj, setRoomObj] = useState(null)
+  const [totalConnectedPeers, setTotalConnectedPeers] = useState(0)
   const audioRef = useRef(null)
 
   const connect = async ({broadcast} = {broadcast: false}) => {
@@ -27,6 +28,7 @@ const App = () => {
     setRoomObj(room)
 
     room.on('peer_joined', async peer => {
+      setTotalConnectedPeers(Object.keys(room.peers).length)
       console.log('peer joined broadcast: ', peer)
       try {
         const {stream} = await peer.stream()
@@ -36,6 +38,7 @@ const App = () => {
       }
 
       peer.on('left', () => {
+        setTotalConnectedPeers(Object.keys(room.peers).length)
         console.log('peer left')
       })
 
@@ -64,6 +67,8 @@ const App = () => {
       { connected
       ? <div>
           <h2>Connected to {isBroadcasting ? broadcastRoomName : listenRoomName}!</h2>
+
+          {totalConnectedPeers} peers
 
           <button onClick={() => leave()}>Leave room</button>
 
