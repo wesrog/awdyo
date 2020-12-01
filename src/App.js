@@ -23,7 +23,7 @@ const App = () => {
   const connect = async ({broadcast} = {broadcast: false}) => {
     setIsBroadcasting(broadcast)
 
-    const room = initRoom(broadcastRoomName)
+    const room = initRoom(broadcast ? broadcastRoomName : listenRoomName)
     setRoomObj(room)
 
     room.on('peer_joined', async peer => {
@@ -62,8 +62,8 @@ const App = () => {
   return (
     <main className="App">
       { connected
-      ? <>
-          <h2>Connected to {broadcastRoomName}!</h2>
+      ? <div>
+          <h2>Connected to {isBroadcasting ? broadcastRoomName : listenRoomName}!</h2>
 
           <button onClick={() => leave()}>Leave room</button>
 
@@ -72,21 +72,33 @@ const App = () => {
             <audio controls autoPlay ref={audioRef}></audio>
           </div>
           }
-        </>
-      : <>
-          <div className="connect">
-            <h2>Select a room to broadcast or listen</h2>
-            <div>
-              Room: <input type="text" onChange={(e) => setBroadcastRoomName(e.target.value)} value={broadcastRoomName} />
-              <button onClick={() => connect({broadcast:true})}>Broadcast</button>
-            </div>
+        </div>
+      : <div className="connect">
+          <h2>Select a room to broadcast or listen</h2>
+          <div>
+            <input
+              type="text"
+              onChange={(e) => setBroadcastRoomName(e.target.value)}
+              value={broadcastRoomName}
+              />
 
-            <div>
-              Room: <input type="text" onChange={(e) => setListenRoomName(e.target.value)} value={listenRoomName} />
-              <button onClick={() => connect()}>Listen</button>
-            </div>
+            <button onClick={() => connect({broadcast:true})}>
+              Broadcast
+            </button>
           </div>
-        </>
+
+          <div>
+            <input
+              type="text"
+              onChange={(e) => setListenRoomName(e.target.value)}
+              value={listenRoomName}
+              />
+
+            <button onClick={() => connect()}>
+              Listen
+            </button>
+          </div>
+        </div>
       }
     </main>
   )
