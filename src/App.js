@@ -1,19 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Room, WebSocketChannel, MucSignaling } from 'rtc-lib'
 import './App.css'
-
-const constraints =  {
-  audio: {
-    autoGainControl: false,
-    channelCount: 2,
-    echoCancellation: false,
-    latency: 0,
-    noiseSuppression: false,
-    sampleRate: 44000,
-    sampleSize: 16,
-    volume: 1.0
-  }
-}
+import { constraints } from './config'
 
 const initRoom = (roomName) => {
   const channel = new WebSocketChannel(`wss://easy.innovailable.eu/${roomName}`)
