@@ -21,20 +21,24 @@ const App = () => {
   const audioRef = useRef(null)
 
   const connect = async ({broadcast} = {broadcast: false}) => {
+    setIsBroadcasting(broadcast)
+
     const room = initRoom(broadcastRoomName)
     setRoomObj(room)
+
     room.on('peer_joined', async peer => {
       console.log('peer joined broadcast: ', peer)
       try {
         const {stream} = await peer.stream()
         audioRef.current.srcObject = stream
       } catch(e) {
-        console.error(e)
+        console.log('no stream offered from peer', e)
       }
 
       peer.on('left', () => {
         console.log('peer left')
       })
+
       peer.on('streams_changed', () => {
         console.log('!!! streams changed')
       })
@@ -44,10 +48,7 @@ const App = () => {
       await room.connect()
       console.log('connected to room: ', room)
       setConnected(true)
-      if (broadcast) {
-        room.local.addStream(constraints)
-        setIsBroadcasting(true)
-      }
+      if (broadcast) room.local.addStream(constraints)
     } catch(err) {
       alert(err)
     }
