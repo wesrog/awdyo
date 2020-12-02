@@ -13,64 +13,56 @@ const initRoom = (roomName) => {
 }
 
 const App = () => {
-  const [broadcastRoomName, setBroadcastRoomName] = useState('w35w0r7d')
+  const [broadcastRoomName, setBroadcastRoomName] = useState('wesworld')
   const [isBroadcasting, setIsBroadcasting] = useState(false)
-  const [listenRoomName, setListenRoomName] = useState('w35w0r7d')
-  const [connected, setConnected] = useState(false)
-  const [roomObj, setRoomObj] = useState(null)
-  const [totalConnectedPeers, setTotalConnectedPeers] = useState(0)
+  const [listenRoomName, setListenRoomName] = useState('wesworld')
+  const [currentRoom, setCurrentRoom] = useState({state:'not connected'})
   const audioRef = useRef(null)
 
   const connect = async ({broadcast} = {broadcast: false}) => {
     setIsBroadcasting(broadcast)
 
     const room = initRoom(broadcast ? broadcastRoomName : listenRoomName)
-    setRoomObj(room)
 
     room.on('peer_joined', async peer => {
-      setTotalConnectedPeers(Object.keys(room.peers).length)
       console.log('peer joined broadcast: ', peer)
-      try {
-        const {stream} = await peer.stream()
-        audioRef.current.srcObject = stream
-      } catch(e) {
-        console.log('no stream offered from peer', e)
-      }
 
       peer.on('left', () => {
-        setTotalConnectedPeers(Object.keys(room.peers).length)
+        console.log(room.peers)
         console.log('peer left')
       })
 
       peer.on('streams_changed', () => {
         console.log('!!! streams changed')
       })
+
+      if (!broadcast) {
+        try {
+          const {stream} = await peer.stream()
+          audioRef.current.srcObject = stream
+        } catch(e) {
+          console.log('no stream offered from peer', e)
+        }
+      }
     })
 
     try {
       await room.connect()
       console.log('connected to room: ', room)
-      setConnected(true)
       if (broadcast) room.local.addStream(constraints)
+      setCurrentRoom(room)
     } catch(err) {
       alert(err)
     }
   }
 
-  const leave = () => {
-    setConnected(false)
-    console.log(roomObj)
-  }
-
   return (
     <main className="App">
-      { connected
+      { currentRoom && currentRoom.state === 'connected'
       ? <div>
           <h2>Connected to {isBroadcasting ? broadcastRoomName : listenRoomName}!</h2>
 
-          {totalConnectedPeers} peers
-
-          <button onClick={() => leave()}>Leave room</button>
+          {Object.keys(currentRoom.peers).length} listeners
 
           { !isBroadcasting &&
           <div id="streams">
