@@ -56,13 +56,15 @@ const App = () => {
     }
   }
 
-  const numListeners = currentRoom.state === 'connected'
+  const isConnected = currentRoom.state === 'connected'
+
+  const numListeners = isConnected
     ? Object.keys(currentRoom.peers).length
     : 0
 
   return (
     <main className="App">
-      { currentRoom && currentRoom.state === 'connected'
+      { currentRoom && isConnected
       ? <div>
           <h2>Connected to {isBroadcasting ? broadcastRoomName : listenRoomName}!</h2>
 
