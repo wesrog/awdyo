@@ -5,7 +5,7 @@ export const constraints =  {
     echoCancellation: false,
     latency: 0,
     noiseSuppression: false,
-    sampleRate: 44000,
+    sampleRate: 48000,
     sampleSize: 16,
     volume: 1.0
   }
