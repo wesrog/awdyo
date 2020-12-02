@@ -80,28 +80,44 @@ const App = () => {
         </div>
       : <div className="connect">
           <h2>Select a room to broadcast or listen</h2>
-          <div>
-            <input
-              type="text"
-              onChange={(e) => setBroadcastRoomName(e.target.value)}
-              value={broadcastRoomName}
-              />
+          <div className="flex">
+            <div>
+              <input
+                type="text"
+                onChange={(e) => setBroadcastRoomName(e.target.value)}
+                value={broadcastRoomName}
+                className="large"
+                />
+            </div>
 
-            <button onClick={() => connect({broadcast:true})}>
-              Broadcast
-            </button>
+            <div>
+              <button
+                onClick={() => connect({broadcast:true})}
+                className="large"
+                >
+                Broadcast
+              </button>
+            </div>
           </div>
 
-          <div>
-            <input
-              type="text"
-              onChange={(e) => setListenRoomName(e.target.value)}
-              value={listenRoomName}
-              />
+          <div className="flex">
+            <div>
+              <input
+                type="text"
+                onChange={(e) => setListenRoomName(e.target.value)}
+                value={listenRoomName}
+                className="large"
+                />
+            </div>
 
-            <button onClick={() => connect()}>
-              Listen
-            </button>
+            <div>
+              <button
+                onClick={() => connect()}
+                className="large"
+                >
+                Listen
+              </button>
+            </div>
           </div>
         </div>
       }
