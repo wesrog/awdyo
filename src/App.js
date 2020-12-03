@@ -13,9 +13,9 @@ const initRoom = (roomName) => {
 }
 
 const App = () => {
-  const [broadcastRoomName, setBroadcastRoomName] = useState('wesworld')
+  const [broadcastRoomName, setBroadcastRoomName] = useState('')
   const [isBroadcasting, setIsBroadcasting] = useState(false)
-  const [listenRoomName, setListenRoomName] = useState('wesworld')
+  const [listenRoomName, setListenRoomName] = useState('')
   const [currentRoom, setCurrentRoom] = useState({state:'not connected'})
   const audioRef = useRef(null)
 
@@ -66,7 +66,11 @@ const App = () => {
     <main className="App">
       { currentRoom && isConnected
       ? <div>
-          <h2>Connected to {isBroadcasting ? broadcastRoomName : listenRoomName}!</h2>
+          <h2>{isBroadcasting
+            ? `Broadcasting on ${broadcastRoomName}`
+            : `Listening to ${listenRoomName}`
+            }
+          </h2>
 
           {numListeners} listener{numListeners !== 1 && 's'}
 
@@ -84,13 +88,14 @@ const App = () => {
                 type="text"
                 onChange={(e) => setBroadcastRoomName(e.target.value)}
                 value={broadcastRoomName}
+                placeholder="wesworld"
                 className="large"
                 />
             </div>
 
             <div>
               <button
-                onClick={() => connect({broadcast:true})}
+                onClick={() => broadcastRoomName !== '' && connect({broadcast:true})}
                 className="large"
                 >
                 Broadcast
@@ -104,13 +109,14 @@ const App = () => {
                 type="text"
                 onChange={(e) => setListenRoomName(e.target.value)}
                 value={listenRoomName}
+                placeholder="wesworld"
                 className="large"
                 />
             </div>
 
             <div>
               <button
-                onClick={() => connect()}
+                onClick={() => listenRoomName !== '' && connect()}
                 className="large"
                 >
                 Listen
