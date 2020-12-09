@@ -18,6 +18,8 @@ const App = () => {
   const [listenRoomName, setListenRoomName] = useState('')
   const [currentRoom, setCurrentRoom] = useState({state:'not connected'})
   const audioRef = useRef(null)
+  const broadcastInputRef = useRef(null)
+  const listenInputRef = useRef(null)
 
   const connect = async ({broadcast} = {broadcast: false}) => {
     setIsBroadcasting(broadcast)
@@ -63,7 +65,7 @@ const App = () => {
     : 0
 
   return (
-    <main tw="flex flex-col items-center justify-center h-screen">
+    <main tw="bg-red-100 flex flex-col items-center justify-center h-screen">
       <GlobalStyles />
       { currentRoom && isConnected
       ? <div tw="bg-white shadow-lg flex flex-col p-10 space-y-5">
@@ -83,7 +85,7 @@ const App = () => {
           }
         </div>
       : <div tw="bg-white shadow-lg flex flex-col p-10 space-y-5">
-          <h2 tw="text-purple-600 font-bold">
+          <h2 tw="text-purple-700 font-bold">
             Choose a room to broadcast or listen
           </h2>
           <div tw="flex space-x-5">
@@ -94,13 +96,18 @@ const App = () => {
                 onChange={(e) => setBroadcastRoomName(e.target.value)}
                 value={broadcastRoomName}
                 placeholder="ex. wesworld"
+                ref={broadcastInputRef}
                 />
             </div>
 
             <div>
               <button
-                tw="px-4 py-2 bg-purple-400 text-white rounded"
-                onClick={() => broadcastRoomName !== '' && connect({broadcast:true})}
+                tw="px-4 py-2 bg-purple-500 text-white rounded"
+                onClick={
+                  () => broadcastRoomName !== ''
+                    ? connect({broadcast:true})
+                    : broadcastInputRef.current.focus()
+                  }
                 >
                 Broadcast
               </button>
@@ -115,13 +122,18 @@ const App = () => {
                 onChange={(e) => setListenRoomName(e.target.value)}
                 value={listenRoomName}
                 placeholder="ex. wesworld"
+                ref={listenInputRef}
                 />
             </div>
 
             <div>
               <button
-                tw="px-4 py-2 bg-purple-400 text-white rounded"
-                onClick={() => listenRoomName !== '' && connect()}
+                tw="px-4 py-2 bg-purple-500 text-white rounded"
+                onClick={
+                  () => listenRoomName !== ''
+                  ? connect()
+                  : listenInputRef.current.focus()
+                }
                 >
                 Listen
               </button>
