@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Room, WebSocketChannel, MucSignaling } from 'rtc-lib'
-import './App.css'
 import { constraints } from './config'
+import tw, { GlobalStyles } from 'twin.macro'
 
 const initRoom = (roomName) => {
   const channel = new WebSocketChannel(`wss://easy.innovailable.eu/${roomName}`)
@@ -63,10 +63,12 @@ const App = () => {
     : 0
 
   return (
-    <main className="App">
+    <main tw="flex flex-col items-center justify-center h-screen">
+      <GlobalStyles />
       { currentRoom && isConnected
-      ? <div>
-          <h2>{isBroadcasting
+      ? <div tw="bg-white shadow-lg flex flex-col p-10 space-y-5">
+          <h2 tw="text-purple-600 font-bold">
+            {isBroadcasting
             ? `Broadcasting on ${broadcastRoomName}`
             : `Listening to ${listenRoomName}`
             }
@@ -80,44 +82,46 @@ const App = () => {
           </div>
           }
         </div>
-      : <div className="connect">
-          <h2>Select a room to broadcast or listen</h2>
-          <div className="flex">
+      : <div tw="bg-white shadow-lg flex flex-col p-10 space-y-5">
+          <h2 tw="text-purple-600 font-bold">
+            Choose a room to broadcast or listen
+          </h2>
+          <div tw="flex space-x-5">
             <div>
               <input
+                tw="border hover:border-black py-2 px-4"
                 type="text"
                 onChange={(e) => setBroadcastRoomName(e.target.value)}
                 value={broadcastRoomName}
                 placeholder="wesworld"
-                className="large"
                 />
             </div>
 
             <div>
               <button
+                tw="px-4 py-2 bg-purple-400 text-white rounded"
                 onClick={() => broadcastRoomName !== '' && connect({broadcast:true})}
-                className="large"
                 >
                 Broadcast
               </button>
             </div>
           </div>
 
-          <div className="flex">
+          <div tw="flex space-x-5">
             <div>
               <input
+                tw="border hover:border-black py-2 px-4"
                 type="text"
                 onChange={(e) => setListenRoomName(e.target.value)}
                 value={listenRoomName}
                 placeholder="wesworld"
-                className="large"
                 />
             </div>
 
             <div>
               <button
+                tw="px-4 py-2 bg-purple-400 text-white rounded"
                 onClick={() => listenRoomName !== '' && connect()}
-                className="large"
                 >
                 Listen
               </button>
