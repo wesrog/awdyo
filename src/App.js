@@ -65,7 +65,7 @@ const App = () => {
     : 0
 
   return (
-    <main tw="bg-red-100 flex flex-col items-center justify-center h-screen">
+    <main tw="bg-red-100 bg-opacity-50 flex flex-col items-center justify-center h-screen">
       <GlobalStyles />
       { currentRoom && isConnected
       ? <div tw="bg-white shadow-lg flex flex-col p-10 space-y-5">
