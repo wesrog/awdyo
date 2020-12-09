@@ -93,7 +93,7 @@ const App = () => {
                 type="text"
                 onChange={(e) => setBroadcastRoomName(e.target.value)}
                 value={broadcastRoomName}
-                placeholder="wesworld"
+                placeholder="ex. wesworld"
                 />
             </div>
 
@@ -114,7 +114,7 @@ const App = () => {
                 type="text"
                 onChange={(e) => setListenRoomName(e.target.value)}
                 value={listenRoomName}
-                placeholder="wesworld"
+                placeholder="ex. wesworld"
                 />
             </div>
 
