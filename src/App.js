@@ -1,16 +1,7 @@
 import React, { useRef, useState } from 'react';
-import { Room, WebSocketChannel, MucSignaling } from 'rtc-lib'
 import { constraints } from './config'
 import tw, { GlobalStyles } from 'twin.macro'
-
-const initRoom = (roomName) => {
-  const channel = new WebSocketChannel(`wss://easy.innovailable.eu/${roomName}`)
-  const signaling = new MucSignaling(channel)
-  const opts = {
-    stun: 'stun:stun.innovailable.eu'
-  }
-  return new Room(signaling, opts)
-}
+import { initRoom } from './lib/room'
 
 const App = () => {
   const [broadcastRoomName, setBroadcastRoomName] = useState('')
